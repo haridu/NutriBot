@@ -16,7 +16,7 @@ namespace Weather_Bot.Models
     [Serializable]
     public class Luis : LuisDialog<Object>
     {
-        String username = "";
+        //String username = "";
         String foodname = "";
         String id = "";
 
@@ -55,13 +55,16 @@ namespace Weather_Bot.Models
             endOutput = "";
 
             int item = 0;
-            var markdownContent = this.user+"#'s Favorites List\n";
+            var markdownContent = this.user+"#Favorites\n";
             foreach (Timeline t in timelines)
             {
-                item++;
-                markdownContent += "**" + item + ") Food name =" + t.food + "** importance = *" + t.importance + "* created in =" + t.createdAt + "\n\n";
+                if (t.username.Equals(this.user))
+                {
+                    item++;
+                    markdownContent += "**" + item + ") Food name =" + t.food + "** importance = *" + t.importance + "* created in =" + t.createdAt + "\n\n";
+                }
             }
-            markdownContent += "![AN IMAGE!](http://robinosborne.co.uk/wp-content/uploads/2016/07/robinosborne.jpg)\n";
+            markdownContent += "![!](https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Emblem-favorites.svg/500px-Emblem-favorites.svg.png)\n";
             markdownContent += "```\n" + item + " items in Favorite list \n```\n";
 
             Activity reply = _message.CreateReply(markdownContent);
@@ -84,7 +87,7 @@ namespace Weather_Bot.Models
             {
                 Timeline timeline = new Timeline()
                 {
-                    username = "yy",
+                    username = this.user,
                     food = foodname,
                     importance = "normal",
                     createdAt = DateTime.Now
@@ -128,14 +131,22 @@ namespace Weather_Bot.Models
 
                     foreach (Timeline t in timelines)
                     {
-
-                        if (t.food.ToLower().Equals(foodname.ToLower()))
+                        if (t.username.Equals(this.user))
                         {
+                            if (t.food.ToLower().Equals(foodname.ToLower()))
+                            {
 
-                            t.importance = importance;
-                            await AzureManager.AzureManagerInstance.UpdateTimeline(t);
+                                t.importance = importance;
+                                await AzureManager.AzureManagerInstance.UpdateTimeline(t);
+                            }
+                            else
+                            {
+                                await context.PostAsync(foodname + "was not found in favorites");
+                                context.Wait(MessageReceived);
+                            }
+
                         }
-
+                       
                     }
                 }
 
@@ -163,12 +174,21 @@ namespace Weather_Bot.Models
 
                 foreach (Timeline t in timelines)
                 {
-
-                    if (t.food.ToLower().Equals(foodname.ToLower()))
+                    if (t.username.Equals(this.user))
                     {
-                        await AzureManager.AzureManagerInstance.DeleteTimeline(t);
-                    }
 
+
+                        if (t.food.ToLower().Equals(foodname.ToLower()))
+                        {
+                            await AzureManager.AzureManagerInstance.DeleteTimeline(t);
+                        }
+                        else
+                        {
+                            await context.PostAsync(foodname + "was not found in favorites");
+                            context.Wait(MessageReceived);
+                        }
+                    }
+                    
 
                 }
                 await context.PostAsync(foodname + "was removed from favorites");

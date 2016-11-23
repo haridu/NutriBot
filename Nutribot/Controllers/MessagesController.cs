@@ -15,6 +15,7 @@ using Microsoft.ProjectOxford.Vision;
 using Microsoft.ProjectOxford.Vision.Contract;
 using Weather_Bot;
 using Nutribot.models;
+using System.Security.Cryptography;
 
 namespace Nutri_Bot
 {
@@ -42,7 +43,7 @@ namespace Nutri_Bot
 
                 var userMessage = activity.Text;
 
-                       
+
 
 
 
@@ -58,32 +59,8 @@ namespace Nutri_Bot
                         await connector.Conversations.ReplyToActivityAsync(reply);
                         break;
                     case "login":
-                        Activity logins = activity.CreateReply($"enter to your account by typing set username <username> and set password <password> :)");
-                        await connector.Conversations.ReplyToActivityAsync(logins);
-
-                        List<login> logines = await AzureLoginManager.AzureManagerInstance.Getlogins();
-                        string username = "yy";
-                        string password = "yy";
-
-                        foreach (login l in logines) 
-                        {
 
 
-                            if (l.username.Equals(username)) {
-
-                                if (l.password.Equals(password)) {
-
-                                    Activity login = activity.CreateReply($"login was sucessfull");
-                                    await connector.Conversations.ReplyToActivityAsync(login);
-
-                                    userData.SetProperty<bool>("logged", true);
-                                    await stateClient.BotState.SetUserDataAsync(activity.ChannelId, activity.From.Id, userData);
-                                    break;
-                                }
-
-                            }
-                            
-                        }
                         break;
                     case "hello":
                     case "hey":
@@ -95,14 +72,14 @@ namespace Nutri_Bot
                         }
                         else
                         {
-                           
+
                             var markdownContent1 = "# Hello :) \n";
-                            
+
                             markdownContent1 += "Hi! ,im Nutrio bot i can get nutrition information of food and save your food into favorites list as you wish,to use this app you have set your name first :)\n\n";
-                           
-                           
+
+
                             markdownContent1 += "![](https://cloud.githubusercontent.com/assets/7879247/20550513/456b0452-b19b-11e6-9dc8-91847505f169.png)\n";
-                           
+
 
                             Activity y = activity.CreateReply(markdownContent1);
 
@@ -122,80 +99,183 @@ namespace Nutri_Bot
                             await connector.Conversations.ReplyToActivityAsync(passedhere);
                             break;
                         }
+                        if (userMessage.ToLower().Substring(0, 6).Equals("create")) {
+
+                            String loginsting = userMessage.ToLower();
+                            string[] splited = loginsting.Split(new char[0]);
+
+                            string username = splited[1];
+                            string password = splited[2];
+
+                            string hashpass = password.GetHashCode().ToString();
+
+                           
 
 
-                        if (userMessage.ToLower().Substring(0, 8).Equals("set name"))
-                        {
-                            string name = userMessage.Substring(9);
-                            userData.SetProperty<string>("Name", name);
-                            await stateClient.BotState.SetUserDataAsync(activity.ChannelId, activity.From.Id, userData);
+                            // var md5 = new MD5CryptoServiceProvider();
+                            // var md5data = md5.ComputeHash(data);
 
-                            Activity nameassined = activity.CreateReply($"name is assigned " + userData.GetProperty<string>("Name") + " , you can continue now :)");
-                            await connector.Conversations.ReplyToActivityAsync(nameassined);
-
-                        }
-                        else
-                        {
-                            bool logged = userData.GetProperty<bool>("logged");
-                            if (!logged == true)
+                            login login = new login()
                             {
-                                //endOutput = "Home City not assigned";
-                                Activity names = activity.CreateReply($"  you are not logged in ,you have to login to your to use this app, login by typing login");
-                                await connector.Conversations.ReplyToActivityAsync(names);
+                                username = username,
+                                password = hashpass
+                              
+                            };
+
+                            List<login> logines = await AzureLoginManager.AzureManagerInstance.Getlogins();
+
+                            bool userexist = false;
+                            foreach (login l in logines)
+                            {
+                                
+                                if (l.username.Equals(username))
+                                {
+                                    Activity loginerr = activity.CreateReply($"error,username is taken try diffrent username");
+                                    await connector.Conversations.ReplyToActivityAsync(loginerr);
+                                    userexist = true;
+                                    
+                                }
+
+                           }
+
+                            if (userexist == false)
+                            {
+                                await AzureLoginManager.AzureManagerInstance.AddTimeline(login);
+
+                                Activity newlogin = activity.CreateReply($"account created");
+                                await connector.Conversations.ReplyToActivityAsync(newlogin);
 
                             }
-                            else
-                            {
-                                String user = "yy";
-                                await Conversation.SendAsync(activity, () => new Luis(user));
-                            }
+
+
+                            
+
 
                         }
-                        break;
+                        if (userMessage.ToLower().Substring(0, 5).Equals("login"))
+                        {
+                            //clears userdata
+                            //await stateClient.BotState.DeleteStateForUserAsync(activity.ChannelId, activity.From.Id);
+
+
+                            String loginsting = userMessage.ToLower();
+                            string[] splited = loginsting.Split(new char[0]);
+
+                            string username = splited[1];
+                            string password = splited[2];
+
+                            string hashpass = password.GetHashCode().ToString();
+
+                            List<login> logines = await AzureLoginManager.AzureManagerInstance.Getlogins();
+
+
+                            foreach (login l in logines)
+                            {
+                                
+
+                                if (l.username.Equals(username))
+                                {
+
+                                    if (l.password.Equals(hashpass))
+                                    {
+
+                                        Activity login = activity.CreateReply($"login was sucessfull");
+                                        await connector.Conversations.ReplyToActivityAsync(login);
+
+                                        userData.SetProperty<bool>("logged", true);
+                                        await stateClient.BotState.SetUserDataAsync(activity.ChannelId, activity.From.Id, userData);
+
+                                        userData.SetProperty<string>("user", username);
+                                        await stateClient.BotState.SetUserDataAsync(activity.ChannelId, activity.From.Id, userData);
+
+                                        break;
+                                    }
+
+
+                                }
+                                
+
+                            
+                        }
+
 
 
                 }
 
-                
 
-               
+
+                if (userMessage.ToLower().Substring(0, 8).Equals("set name"))
+                {
+                    string name = userMessage.Substring(9);
+                    userData.SetProperty<string>("Name", name);
+                    await stateClient.BotState.SetUserDataAsync(activity.ChannelId, activity.From.Id, userData);
+
+                    Activity nameassined = activity.CreateReply($"name is assigned " + userData.GetProperty<string>("Name") + " , you can continue now :)");
+                    await connector.Conversations.ReplyToActivityAsync(nameassined);
+
+                }
+                else
+                {
+                    bool logged = userData.GetProperty<bool>("logged");
+                    if (!logged == true)
+                    {
+                        //endOutput = "Home City not assigned";
+                        Activity names = activity.CreateReply($"  you are not logged in ,you have to login to your to use this app, login by typing login");
+                        await connector.Conversations.ReplyToActivityAsync(names);
+
+                    }
+                    else
+                    {
+
+                        await Conversation.SendAsync(activity, () => new Luis(userData.GetProperty<string>("user")));
+                    }
+
+                }
+                break;
+
 
             }
+
+
+
+
+
+        }
             else
             {
                 HandleSystemMessage(activity);
-            }
-            var response = Request.CreateResponse(HttpStatusCode.OK);
+    }
+    var response = Request.CreateResponse(HttpStatusCode.OK);
             return response;
         }
 
-        private Activity HandleSystemMessage(Activity message)
-        {
-            if (message.Type == ActivityTypes.DeleteUserData)
-            {
-                // Implement user deletion here
-                // If we handle user deletion, return a real message
-            }
-            else if (message.Type == ActivityTypes.ConversationUpdate)
-            {
-                // Handle conversation state changes, like members being added and removed
-                // Use Activity.MembersAdded and Activity.MembersRemoved and Activity.Action for info
-                // Not available in all channels
-            }
-            else if (message.Type == ActivityTypes.ContactRelationUpdate)
-            {
-                // Handle add/remove from contact lists
-                // Activity.From + Activity.Action represent what happened
-            }
-            else if (message.Type == ActivityTypes.Typing)
-            {
-                // Handle knowing tha the user is typing
-            }
-            else if (message.Type == ActivityTypes.Ping)
-            {
-            }
+private Activity HandleSystemMessage(Activity message)
+{
+    if (message.Type == ActivityTypes.DeleteUserData)
+    {
+        // Implement user deletion here
+        // If we handle user deletion, return a real message
+    }
+    else if (message.Type == ActivityTypes.ConversationUpdate)
+    {
+        // Handle conversation state changes, like members being added and removed
+        // Use Activity.MembersAdded and Activity.MembersRemoved and Activity.Action for info
+        // Not available in all channels
+    }
+    else if (message.Type == ActivityTypes.ContactRelationUpdate)
+    {
+        // Handle add/remove from contact lists
+        // Activity.From + Activity.Action represent what happened
+    }
+    else if (message.Type == ActivityTypes.Typing)
+    {
+        // Handle knowing tha the user is typing
+    }
+    else if (message.Type == ActivityTypes.Ping)
+    {
+    }
 
-            return null;
-        }
+    return null;
+}
     }
 }
