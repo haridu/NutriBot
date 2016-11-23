@@ -54,7 +54,7 @@ namespace Weather_Bot.Models
                 item++;
                 markdownContent += "**" + item + ") Food name =" + t.food + "** importance = *" + t.importance + "* created in =" + t.createdAt + "\n\n";
             }
-            markdownContent += "(https://c1.staticflickr.com/7/6142/6026641793_285ce794d2_b.jpg)\n";
+            markdownContent += "![AN IMAGE!](http://robinosborne.co.uk/wp-content/uploads/2016/07/robinosborne.jpg)\n";
             markdownContent += "```\n" + item + " items in Favorite list \n```\n";
 
             Activity reply = _message.CreateReply(markdownContent);
@@ -231,13 +231,11 @@ namespace Weather_Bot.Models
 
 
                     var markdownContent = "# " + brandname + "'s " + foodname + " Nutrition Facts\n";
-                    markdownContent += "Calories" + calories + "\n\n";
-                    markdownContent += "sugers " + sugers + "\n\n";
-                    markdownContent += "calciam " + calciaum + "\n\n";
-                    markdownContent += " iron " + iron + "\n\n";
-
-
-
+                    markdownContent += "Calories" + calories + "kcal \n\n";
+                    markdownContent += "sugers " + sugers + "g \n\n";
+                    markdownContent += "calciam " + calciaum + "% \n\n";
+                    markdownContent += " iron " + iron + "% \n\n";
+                    
                     Activity reply = _message.CreateReply(markdownContent);
 
                     await context.PostAsync(reply);

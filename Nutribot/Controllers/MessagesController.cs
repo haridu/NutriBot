@@ -60,8 +60,20 @@ namespace Nutri_Bot
                         }
                         else
                         {
-                            Activity hello = activity.CreateReply($"Hi! ,im Nutrio bot i can get nutrition information of food and save your food into favorites list as you wish,to use this app you have set your name first :)");
-                            await connector.Conversations.ReplyToActivityAsync(hello);
+                           
+                            var markdownContent1 = "# Hello :) \n";
+                            
+                            markdownContent1 += "Hi! ,im Nutrio bot i can get nutrition information of food and save your food into favorites list as you wish,to use this app you have set your name first :)\n\n";
+                           
+                           
+                            markdownContent1 += "![AN IMAGE!](https://cloud.githubusercontent.com/assets/7879247/20550513/456b0452-b19b-11e6-9dc8-91847505f169.png)\n";
+                           
+
+                            Activity y = activity.CreateReply(markdownContent1);
+
+                            await connector.Conversations.ReplyToActivityAsync(y);
+
+
                             userData.SetProperty<bool>("SentGreeting", true);
                             await stateClient.BotState.SetUserDataAsync(activity.ChannelId, activity.From.Id, userData);
                         }
