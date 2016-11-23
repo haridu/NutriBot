@@ -37,6 +37,13 @@ namespace Weather_Bot.Models
 
 
         String endOutput = "";
+        private string user;
+
+        public Luis(string user)
+        {
+            this.user = user;
+        }
+
         [LuisIntent("Viewfavorites")]
         public async Task viewlist(IDialogContext context, LuisResult result)
         {
@@ -48,7 +55,7 @@ namespace Weather_Bot.Models
             endOutput = "";
 
             int item = 0;
-            var markdownContent = "#Favorites List\n";
+            var markdownContent = this.user+"#'s Favorites List\n";
             foreach (Timeline t in timelines)
             {
                 item++;

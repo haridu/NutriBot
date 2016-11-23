@@ -11,7 +11,10 @@ using Nutri_Bot;
 
 using Microsoft.Bot.Builder.Dialogs;
 using Weather_Bot.Models;
-
+using Microsoft.ProjectOxford.Vision;
+using Microsoft.ProjectOxford.Vision.Contract;
+using Weather_Bot;
+using Nutribot.models;
 
 namespace Nutri_Bot
 {
@@ -36,7 +39,11 @@ namespace Nutri_Bot
                 StateClient stateClient = activity.GetStateClient();
                 BotData userData = await stateClient.BotState.GetUserDataAsync(activity.ChannelId, activity.From.Id);
 
+
                 var userMessage = activity.Text;
+
+                       
+
 
 
 
@@ -49,6 +56,34 @@ namespace Nutri_Bot
                         await stateClient.BotState.DeleteStateForUserAsync(activity.ChannelId, activity.From.Id);
                         Activity reply = activity.CreateReply($"User data is cleared");
                         await connector.Conversations.ReplyToActivityAsync(reply);
+                        break;
+                    case "login":
+                        Activity logins = activity.CreateReply($"enter to your account by typing set username <username> and set password <password> :)");
+                        await connector.Conversations.ReplyToActivityAsync(logins);
+
+                        List<login> logines = await AzureLoginManager.AzureManagerInstance.Getlogins();
+                        string username = "yy";
+                        string password = "yy";
+
+                        foreach (login l in logines) 
+                        {
+
+
+                            if (l.username.Equals(username)) {
+
+                                if (l.password.Equals(password)) {
+
+                                    Activity login = activity.CreateReply($"login was sucessfull");
+                                    await connector.Conversations.ReplyToActivityAsync(login);
+
+                                    userData.SetProperty<bool>("logged", true);
+                                    await stateClient.BotState.SetUserDataAsync(activity.ChannelId, activity.From.Id, userData);
+                                    break;
+                                }
+
+                            }
+                            
+                        }
                         break;
                     case "hello":
                     case "hey":
@@ -66,7 +101,7 @@ namespace Nutri_Bot
                             markdownContent1 += "Hi! ,im Nutrio bot i can get nutrition information of food and save your food into favorites list as you wish,to use this app you have set your name first :)\n\n";
                            
                            
-                            markdownContent1 += "![AN IMAGE!](https://cloud.githubusercontent.com/assets/7879247/20550513/456b0452-b19b-11e6-9dc8-91847505f169.png)\n";
+                            markdownContent1 += "![](https://cloud.githubusercontent.com/assets/7879247/20550513/456b0452-b19b-11e6-9dc8-91847505f169.png)\n";
                            
 
                             Activity y = activity.CreateReply(markdownContent1);
@@ -101,18 +136,18 @@ namespace Nutri_Bot
                         }
                         else
                         {
-                            string name = userData.GetProperty<string>("Name");
-                            if (name == null)
+                            bool logged = userData.GetProperty<bool>("logged");
+                            if (!logged == true)
                             {
                                 //endOutput = "Home City not assigned";
-                                Activity names = activity.CreateReply($"  name is not assigned ,you have to set your to use this app,assign name by typing set name <yourname>");
+                                Activity names = activity.CreateReply($"  you are not logged in ,you have to login to your to use this app, login by typing login");
                                 await connector.Conversations.ReplyToActivityAsync(names);
 
                             }
                             else
                             {
-
-                                await Conversation.SendAsync(activity, () => new Luis());
+                                String user = "yy";
+                                await Conversation.SendAsync(activity, () => new Luis(user));
                             }
 
                         }
@@ -120,6 +155,10 @@ namespace Nutri_Bot
 
 
                 }
+
+                
+
+               
 
             }
             else
