@@ -58,11 +58,10 @@ namespace Weather_Bot.Models
             foreach (Timeline t in timelines)
             {
                 if ((!t.username.Equals(null)) || (!(t.username.Equals(null)))){
-                    if (t.username.Equals(this.user))
-                    {
+                   
                         item++;
                         markdownContent += "** item id[" + t.id + "] Food name =" + t.food + "** importance = *" + t.importance + "* created in =" + t.createdAt + "\n\n";
-                    }
+                   
                 }
             }
             markdownContent += "![](https://cloud.githubusercontent.com/assets/7879247/20590892/90b146e8-b28a-11e6-855e-1eb9beb7f7b4.jpg)\n";
