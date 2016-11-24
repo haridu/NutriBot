@@ -54,7 +54,7 @@ namespace Weather_Bot.Models
             endOutput = "";
 
             int item = 0;
-            var markdownContent = "#Favorites List\n";
+            var markdownContent = this.user+" #Favorites List\n";
             foreach (Timeline t in timelines)
             {
                 if ((!t.username.Equals(null)) || (!(t.username.Equals(null)))){
