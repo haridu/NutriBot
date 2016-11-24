@@ -57,10 +57,12 @@ namespace Weather_Bot.Models
             var markdownContent = "#Favorites List\n";
             foreach (Timeline t in timelines)
             {
-                if (t.username.Equals(this.user))
-                {
-                    item++;
-                    markdownContent += "** item id[" + t.id + "] Food name =" + t.food + "** importance = *" + t.importance + "* created in =" + t.createdAt + "\n\n";
+                if ((!t.username.Equals(null)) || (!(t.username.Equals(null)))){
+                    if (t.username.Equals(this.user))
+                    {
+                        item++;
+                        markdownContent += "** item id[" + t.id + "] Food name =" + t.food + "** importance = *" + t.importance + "* created in =" + t.createdAt + "\n\n";
+                    }
                 }
             }
             markdownContent += "![](https://cloud.githubusercontent.com/assets/7879247/20590892/90b146e8-b28a-11e6-855e-1eb9beb7f7b4.jpg)\n";
@@ -76,6 +78,7 @@ namespace Weather_Bot.Models
             context.Wait(MessageReceived);
 
         }
+
 
 
 
@@ -220,7 +223,7 @@ namespace Weather_Bot.Models
         {
             var markdownContent = "# unknown command  \n";
             markdownContent += "sorry,i dont have any idea what you are talking about\n\n";
-            markdownContent += "![](https://cloud.githubusercontent.com/assets/7879247/20590892/90b146e8-b28a-11e6-855e-1eb9beb7f7b4.jpg)\n";
+            markdownContent += "![](https://cloud.githubusercontent.com/assets/7879247/20590890/8e8eb396-b28a-11e6-8ab1-89e0310c9647.jpg)\n";
             Activity areply = _message.CreateReply(markdownContent);
             await context.PostAsync(areply);
             // await context.PostAsync("i dont have any idea what you are talking about");
