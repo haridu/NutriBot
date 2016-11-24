@@ -258,9 +258,6 @@ namespace Nutri_Bot
                                         string id = splited[1];
 
 
-                                        Activity nameassined = activity.CreateReply($" food id" + id + " was deleted from favorites");
-                                        await connector.Conversations.ReplyToActivityAsync(nameassined);
-
                                         List<Timeline> timelines = await AzureManager.AzureManagerInstance.GetTimelines();
                                         bool iteamfound = false;
 
@@ -268,30 +265,30 @@ namespace Nutri_Bot
                                         {
 
 
-                                            if (t.id.Equals("1"))
+                                            if (t.id.Equals(id))
                                             {
                                                 iteamfound = true;
                                                 await AzureManager.AzureManagerInstance.DeleteTimeline(t);
 
-                                               
-
-                                           }
+                                             }
 
                                         }
 
                                         if (iteamfound == true)
                                         {
-                                            Activity name = activity.CreateReply($" food id" + id + " was deleted from favorites");
+                                            Activity name = activity.CreateReply($" food id " + id + " was deleted from favorites");
                                             await connector.Conversations.ReplyToActivityAsync(name);
                                         }
-                                        else
-                                        {
-                                            Activity name = activity.CreateReply($" food id" + id + " was not found");
+                                        else {
+                                            Activity name = activity.CreateReply($" food id " + id + " was not found");
                                             await connector.Conversations.ReplyToActivityAsync(name);
                                         }
+                                        
+
 
                                     }
-                                   
+                                    
+
 
 
                                     if (userMessage.ToLower().Substring(0, 14).Equals("set importance"))
