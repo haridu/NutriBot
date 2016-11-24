@@ -364,7 +364,7 @@ namespace Nutri_Bot
 
                                     if (toluis == true)
                                     {
-                                        await Conversation.SendAsync(activity, () => new Luis(userData.GetProperty<string>("username")));
+                                        await Conversation.SendAsync(activity, () => new Luis(userData.GetProperty<string>("user")));
                                     }
                                 }
                             }
