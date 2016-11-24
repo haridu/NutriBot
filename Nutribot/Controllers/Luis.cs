@@ -59,11 +59,11 @@ namespace Weather_Bot.Models
             {
                 if (t.username.Equals(this.user))
                 {
-                    
+                    item++;
                     markdownContent += "** item id[" + t.id + "] Food name =" + t.food + "** importance = *" + t.importance + "* created in =" + t.createdAt + "\n\n";
                 }
             }
-            markdownContent += "(https://c1.staticflickr.com/7/6142/6026641793_285ce794d2_b.jpg)\n";
+            markdownContent += "![](https://cloud.githubusercontent.com/assets/7879247/20590892/90b146e8-b28a-11e6-855e-1eb9beb7f7b4.jpg)\n";
             markdownContent += "```\n" + item + " items in Favorite list \n```\n";
 
             Activity reply = _message.CreateReply(markdownContent);
@@ -103,53 +103,31 @@ namespace Weather_Bot.Models
 
                 await AzureManager.AzureManagerInstance.AddTimeline(timeline);
 
+                var markdownContent = "#" + foodname + "added to favorites  \n";
+                markdownContent += foodname + "added to favorites  at[" + timeline.createdAt + "]with normal importance\n\n";
+                markdownContent += "![](https://cloud.githubusercontent.com/assets/7879247/20590892/90b146e8-b28a-11e6-855e-1eb9beb7f7b4.jpg)\n";
+                Activity areply = _message.CreateReply(markdownContent);
 
-
-                endOutput = foodname + "added to favorites  at[" + timeline.createdAt + "]with normal importance";
+                await context.PostAsync(areply);
+                //endOutput = foodname + "added to favorites  at[" + timeline.createdAt + "]with normal importance";
             }
             else
             {
-                endOutput = "no food item is selected by searching foods";
+                // endOutput = "no food item is selected by searching foods";
 
+                var markdownContent = "#no food item is selected\n";
+                markdownContent += "no food item is selected by searching foods\n\n";
+                markdownContent += "![](https://cloud.githubusercontent.com/assets/7879247/20590890/8e8eb396-b28a-11e6-8ab1-89e0310c9647.jpg)\n";
+                Activity areply = _message.CreateReply(markdownContent);
+                await context.PostAsync(areply);
             }
-            await context.PostAsync(endOutput);
-            context.Wait(MessageReceived);
+            //await context.PostAsync(endOutput);
+            //context.Wait(MessageReceived);
 
         }
 
 
-       /*
-
-        [LuisIntent("deleteitem")]
-        public async Task delete(IDialogContext context, LuisResult result)
-        {
-            String foodname = "";
-
-            List<Timeline> timelines = await AzureManager.AzureManagerInstance.GetTimelines();
-
-            EntityRecommendation recomendation;
-            if (result.TryFindEntity("food", out recomendation))
-            {
-
-                foodname = recomendation.Entity;
-
-
-
-                foreach (Timeline t in timelines)
-                {
-
-                    if (t.food.ToLower().Equals(foodname.ToLower()))
-                    {
-                        await AzureManager.AzureManagerInstance.DeleteTimeline(t);
-                    }
-
-
-                }
-                await context.PostAsync(foodname + "was removed from favorites");
-                context.Wait(MessageReceived);
-            }
-
-        }*/
+       
 
 
 
@@ -212,12 +190,12 @@ namespace Weather_Bot.Models
 
 
                     var markdownContent = "# " + brandname + "'s " + foodname + " Nutrition Facts\n";
-                    markdownContent += "Calories" + calories + "\n\n";
-                    markdownContent += "sugers " + sugers + "\n\n";
-                    markdownContent += "calciam " + calciaum + "\n\n";
-                    markdownContent += " iron " + iron + "\n\n";
+                    markdownContent += "Calories =" + calories + " kcal\n\n";
+                    markdownContent += "sugers =" + sugers + " g\n\n";
+                    markdownContent += "calciam =" + calciaum +" %\n\n";
+                    markdownContent += " iron =" + iron + " %\n\n";
 
-
+                    markdownContent += "![](https://cloud.githubusercontent.com/assets/7879247/20590871/82ece74c-b28a-11e6-9fe6-18a0ab7c5c63.jpg)\n";
 
                     Activity reply = _message.CreateReply(markdownContent);
 
@@ -240,8 +218,12 @@ namespace Weather_Bot.Models
         [LuisIntent("")]
         public async Task none(IDialogContext context, LuisResult result)
         {
-
-            await context.PostAsync("i dont have any idea what you are talking about");
+            var markdownContent = "# unknown command  \n";
+            markdownContent += "sorry,i dont have any idea what you are talking about\n\n";
+            markdownContent += "![](https://cloud.githubusercontent.com/assets/7879247/20590892/90b146e8-b28a-11e6-855e-1eb9beb7f7b4.jpg)\n";
+            Activity areply = _message.CreateReply(markdownContent);
+            await context.PostAsync(areply);
+            // await context.PostAsync("i dont have any idea what you are talking about");
             context.Wait(MessageReceived);
         }
 

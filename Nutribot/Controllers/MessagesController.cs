@@ -58,8 +58,22 @@ namespace Nutri_Bot
                         Activity reply = activity.CreateReply($"User data is cleared");
                         await connector.Conversations.ReplyToActivityAsync(reply);
                         break;
-                    case "login":
+                    case "help":
+                        var markdownContenth = "#HELP \n";
+                        markdownContenth += "**Create Account Command = create <yourusername> <yourusername> **\n\n";
+                        markdownContenth += "**Login Command = Login <yourusername> <yourusername> **\n\n";
+                        markdownContenth += "**Login to test account Command = Login Test Test **\n\n";
+                        markdownContenth += "**Search Nutrition Command = Nutritions of <fooditem> **\n\n";
+                        markdownContenth += "**add item to favorites Command = add <fooditem> to favorites**\n\n";
+                        markdownContenth += "**view favorites Command = View favorites**\n\n";
+                        markdownContenth += "**set food favorite importance command = set importance <id> <lable>**\n\n";
+                        markdownContenth += "**delete item from favorities command = delete <id> **\n\n";
+                        markdownContenth += "**clear userdata and logout command = clear **\n\n";
 
+                        markdownContenth += "![](https://cloud.githubusercontent.com/assets/7879247/20590871/82ece74c-b28a-11e6-9fe6-18a0ab7c5c63.jpg)\n";
+                        Activity areplyh = activity.CreateReply(markdownContenth);
+
+                        await connector.Conversations.ReplyToActivityAsync(areplyh);
 
                         break;
                     case "hello":
@@ -75,7 +89,7 @@ namespace Nutri_Bot
 
                             var markdownContent1 = "# Hello :) \n";
 
-                            markdownContent1 += "Hi! ,im Nutrio bot i can get nutrition information of food and save your food into favorites list as you wish,to use this app you have set your name first :)\n\n";
+                            markdownContent1 += "Hi! ,im Nutrio bot i can get nutrition information of food and save your food into favorites list as you wish,to use this app you have to create account and login to it type help for user guide :)\n\n";
 
 
                             markdownContent1 += "![](https://cloud.githubusercontent.com/assets/7879247/20550513/456b0452-b19b-11e6-9dc8-91847505f169.png)\n";
@@ -95,8 +109,12 @@ namespace Nutri_Bot
 
                         if (userMessage.Length < 8)
                         {
-                            Activity passedhere = activity.CreateReply($"unknowen command");
-                            await connector.Conversations.ReplyToActivityAsync(passedhere);
+                            var markdownContent = "#unknown command\n";
+                            markdownContent += "unknown command!,type Help to view NutriBot guide\n\n";
+                            markdownContent += "![](https://cloud.githubusercontent.com/assets/7879247/20590890/8e8eb396-b28a-11e6-8ab1-89e0310c9647.jpg)\n";
+                            Activity areply = activity.CreateReply(markdownContent);
+
+                            await connector.Conversations.ReplyToActivityAsync(areply);
                             break;
                         }
 
@@ -116,8 +134,7 @@ namespace Nutri_Bot
 
 
 
-                            // var md5 = new MD5CryptoServiceProvider();
-                            // var md5data = md5.ComputeHash(data);
+                         
 
                             login login = new login()
                             {
@@ -134,8 +151,13 @@ namespace Nutri_Bot
 
                                 if (l.username.Equals(username))
                                 {
-                                    Activity loginerr = activity.CreateReply($"error,username is taken try diffrent username");
-                                    await connector.Conversations.ReplyToActivityAsync(loginerr);
+                                    var markdownContent = "# username is taken \n";
+                                    markdownContent += "error,username is taken try diffrent username\n\n";
+                                    markdownContent += "![](https://cloud.githubusercontent.com/assets/7879247/20590890/8e8eb396-b28a-11e6-8ab1-89e0310c9647.jpg)\n";
+                                    Activity areply = activity.CreateReply(markdownContent);
+
+                                    //Activity loginerr = activity.CreateReply($"error,username is taken try diffrent username");
+                                    await connector.Conversations.ReplyToActivityAsync(areply);
                                     userexist = true;
 
                                 }
@@ -146,8 +168,12 @@ namespace Nutri_Bot
                             {
                                 await AzureLoginManager.AzureManagerInstance.AddTimeline(login);
 
-                                Activity newlogin = activity.CreateReply($"account created");
-                                await connector.Conversations.ReplyToActivityAsync(newlogin);
+                                var markdownContent = "#User Account" + username + " created \n";
+                                markdownContent += ":) now you can login by typing login <username> <password>\n\n";
+                                markdownContent += "![](https://cloud.githubusercontent.com/assets/7879247/20590871/82ece74c-b28a-11e6-9fe6-18a0ab7c5c63.jpg)\n";
+                                Activity areply = activity.CreateReply(markdownContent);
+
+                                await connector.Conversations.ReplyToActivityAsync(areply);
 
                             }
 
@@ -159,8 +185,7 @@ namespace Nutri_Bot
                         if (userMessage.ToLower().Substring(0, 5).Equals("login"))
                         {
                             isadministartion = true;
-                            //clears userdata
-                            //await stateClient.BotState.DeleteStateForUserAsync(activity.ChannelId, activity.From.Id);
+                            
 
 
                             String loginsting = userMessage.ToLower();
@@ -183,8 +208,13 @@ namespace Nutri_Bot
                                     userfound = true;
                                     if (l.password.Equals(hashpass))
                                     {
-                                        Activity login = activity.CreateReply($"login was sucessfull");
-                                        await connector.Conversations.ReplyToActivityAsync(login);
+                                        
+                                        var markdownContent = "#Welcome "+username+" \n";
+                                        markdownContent += "Login sucessfull\n\n";
+                                        markdownContent += "![](https://cloud.githubusercontent.com/assets/7879247/20590871/82ece74c-b28a-11e6-9fe6-18a0ab7c5c63.jpg)\n";
+                                        Activity areply = activity.CreateReply(markdownContent);
+
+                                        await connector.Conversations.ReplyToActivityAsync(areply);
 
                                         userData.SetProperty<bool>("logged", true);
                                         await stateClient.BotState.SetUserDataAsync(activity.ChannelId, activity.From.Id, userData);
@@ -235,9 +265,13 @@ namespace Nutri_Bot
                                 if (isadministartion == false)
                                 {
 
-                                    //endOutput = "Home City not assigned";
-                                    Activity names = activity.CreateReply($"  you are not logged in ,you have to login to your to use this app, login by typing login");
-                                    await connector.Conversations.ReplyToActivityAsync(names);
+                                    
+                                    var markdownContent = "#Not logged in\n";
+                                    markdownContent += "you are not logged in ,you have to login to your to use this app, login by typing login <username> <password>\n\n";
+                                    markdownContent += "![](https://cloud.githubusercontent.com/assets/7879247/20590871/82ece74c-b28a-11e6-9fe6-18a0ab7c5c63.jpg)\n";
+                                    Activity areply = activity.CreateReply(markdownContent);
+
+                                    await connector.Conversations.ReplyToActivityAsync(areply);
                                 }
 
                             }
@@ -245,13 +279,13 @@ namespace Nutri_Bot
                             {
                                 if (isadministartion == false)
                                 {
-                                    
 
+                                    Boolean toluis = true;
 
 
                                     if (userMessage.ToLower().Substring(0, 6).Equals("delete"))
                                     {
-                                        
+                                        toluis = false;
                                         String importance = userMessage.ToLower();
                                         string[] splited = importance.Split(new char[0]);
 
@@ -270,29 +304,36 @@ namespace Nutri_Bot
                                                 iteamfound = true;
                                                 await AzureManager.AzureManagerInstance.DeleteTimeline(t);
 
-                                             }
+                                            }
 
                                         }
 
                                         if (iteamfound == true)
                                         {
-                                            Activity name = activity.CreateReply($" food id " + id + " was deleted from favorites");
-                                            await connector.Conversations.ReplyToActivityAsync(name);
+
+                                            var markdownContent = "#Item deleted\n";
+                                            markdownContent += "*food id " + id + " was deleted from favorites*\n\n";
+                                            markdownContent += "![!](https://cloud.githubusercontent.com/assets/7879247/20590871/82ece74c-b28a-11e6-9fe6-18a0ab7c5c63.jpg)\n";
+                                            Activity areply = activity.CreateReply(markdownContent);
+
+                                            await connector.Conversations.ReplyToActivityAsync(areply);
                                         }
-                                        else {
+                                        else
+                                        {
                                             Activity name = activity.CreateReply($" food id " + id + " was not found");
                                             await connector.Conversations.ReplyToActivityAsync(name);
                                         }
-                                        
+
 
 
                                     }
-                                    
+
 
 
 
                                     if (userMessage.ToLower().Substring(0, 14).Equals("set importance"))
                                     {
+                                        toluis = false;
                                         String importance = userMessage.ToLower();
                                         string[] splited = importance.Split(new char[0]);
                                         List<Timeline> timelines = await AzureManager.AzureManagerInstance.GetTimelines();
@@ -307,20 +348,22 @@ namespace Nutri_Bot
 
                                                 t.importance = value;
                                                 await AzureManager.AzureManagerInstance.UpdateTimeline(t);
-                                                Activity update = activity.CreateReply($" importance of "+t.food+" was updated");
+                                                Activity update = activity.CreateReply($" importance of " + t.food + " was updated");
                                                 await connector.Conversations.ReplyToActivityAsync(update);
                                             }
 
                                         }
 
-                                       
+
 
                                     }
 
 
 
-
-                                    await Conversation.SendAsync(activity, () => new Luis(userData.GetProperty<string>("user")));
+                                    if (toluis == true)
+                                    {
+                                        await Conversation.SendAsync(activity, () => new Luis(userData.GetProperty<string>("user")));
+                                    }
                                 }
                             }
 
