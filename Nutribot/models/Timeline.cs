@@ -32,5 +32,6 @@ namespace Nutribot.models
         [JsonProperty(PropertyName = "importance")]
         public string importance { get; set; }
 
+        
     }
 }

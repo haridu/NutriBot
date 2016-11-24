@@ -3,7 +3,6 @@ using Microsoft.Bot.Builder.Luis;
 using Microsoft.Bot.Builder.Luis.Models;
 using Microsoft.Bot.Connector;
 using Newtonsoft.Json;
-
 using Nutribot.models;
 using System;
 using System.Collections.Generic;
@@ -16,7 +15,7 @@ namespace Weather_Bot.Models
     [Serializable]
     public class Luis : LuisDialog<Object>
     {
-        //String username = "";
+        String username = "";
         String foodname = "";
         String id = "";
 
@@ -55,16 +54,16 @@ namespace Weather_Bot.Models
             endOutput = "";
 
             int item = 0;
-            var markdownContent = this.user+"#Favorites\n";
+            var markdownContent = "#Favorites List\n";
             foreach (Timeline t in timelines)
             {
                 if (t.username.Equals(this.user))
                 {
-                    item++;
-                    markdownContent += "**" + item + ") Food name =" + t.food + "** importance = *" + t.importance + "* created in =" + t.createdAt + "\n\n";
+                    
+                    markdownContent += "** item id[" + t.id + "] Food name =" + t.food + "** importance = *" + t.importance + "* created in =" + t.createdAt + "\n\n";
                 }
             }
-            markdownContent += "![!](https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Emblem-favorites.svg/500px-Emblem-favorites.svg.png)\n";
+            markdownContent += "(https://c1.staticflickr.com/7/6142/6026641793_285ce794d2_b.jpg)\n";
             markdownContent += "```\n" + item + " items in Favorite list \n```\n";
 
             Activity reply = _message.CreateReply(markdownContent);
@@ -83,10 +82,19 @@ namespace Weather_Bot.Models
         [LuisIntent("additem")]
         public async Task addtolist(IDialogContext context, LuisResult result)
         {
-            if (!foodname.Equals(""))
+            int id = 0;
+            List<Timeline> timelines = await AzureManager.AzureManagerInstance.GetTimelines();
+            foreach (Timeline t in timelines) {
+                id++;
+            }
+
+            id = id + 1;
+
+                if (!foodname.Equals(""))
             {
                 Timeline timeline = new Timeline()
                 {
+                    id=id.ToString(),
                     username = this.user,
                     food = foodname,
                     importance = "normal",
@@ -110,52 +118,7 @@ namespace Weather_Bot.Models
         }
 
 
-        [LuisIntent("updateimportnance")]
-        public async Task updateimportance(IDialogContext context, LuisResult result)
-        {
-            String foodname = "";
-            String importance = "";
-            List<Timeline> timelines = await AzureManager.AzureManagerInstance.GetTimelines();
-
-            EntityRecommendation recomendation;
-            if (result.TryFindEntity("food", out recomendation))
-            {
-
-                foodname = recomendation.Entity;
-
-
-                if (result.TryFindEntity("importance", out recomendation))
-                {
-                    importance = recomendation.Entity;
-
-
-                    foreach (Timeline t in timelines)
-                    {
-                        if (t.username.Equals(this.user))
-                        {
-                            if (t.food.ToLower().Equals(foodname.ToLower()))
-                            {
-
-                                t.importance = importance;
-                                await AzureManager.AzureManagerInstance.UpdateTimeline(t);
-                            }
-                            else
-                            {
-                                await context.PostAsync(foodname + "was not found in favorites");
-                                context.Wait(MessageReceived);
-                            }
-
-                        }
-                       
-                    }
-                }
-
-
-
-                await context.PostAsync(foodname + "importance changed to " + importance + " value");
-                context.Wait(MessageReceived);
-            }
-        }
+       /*
 
         [LuisIntent("deleteitem")]
         public async Task delete(IDialogContext context, LuisResult result)
@@ -174,28 +137,19 @@ namespace Weather_Bot.Models
 
                 foreach (Timeline t in timelines)
                 {
-                    if (t.username.Equals(this.user))
+
+                    if (t.food.ToLower().Equals(foodname.ToLower()))
                     {
-
-
-                        if (t.food.ToLower().Equals(foodname.ToLower()))
-                        {
-                            await AzureManager.AzureManagerInstance.DeleteTimeline(t);
-                        }
-                        else
-                        {
-                            await context.PostAsync(foodname + "was not found in favorites");
-                            context.Wait(MessageReceived);
-                        }
+                        await AzureManager.AzureManagerInstance.DeleteTimeline(t);
                     }
-                    
+
 
                 }
                 await context.PostAsync(foodname + "was removed from favorites");
                 context.Wait(MessageReceived);
             }
 
-        }
+        }*/
 
 
 
@@ -258,11 +212,13 @@ namespace Weather_Bot.Models
 
 
                     var markdownContent = "# " + brandname + "'s " + foodname + " Nutrition Facts\n";
-                    markdownContent += "Calories" + calories + "kcal \n\n";
-                    markdownContent += "sugers " + sugers + "g \n\n";
-                    markdownContent += "calciam " + calciaum + "% \n\n";
-                    markdownContent += " iron " + iron + "% \n\n";
-                    
+                    markdownContent += "Calories" + calories + "\n\n";
+                    markdownContent += "sugers " + sugers + "\n\n";
+                    markdownContent += "calciam " + calciaum + "\n\n";
+                    markdownContent += " iron " + iron + "\n\n";
+
+
+
                     Activity reply = _message.CreateReply(markdownContent);
 
                     await context.PostAsync(reply);

@@ -42,6 +42,7 @@ namespace Nutri_Bot
 
 
                 var userMessage = activity.Text;
+                bool isadministartion = false;
 
 
 
@@ -49,7 +50,6 @@ namespace Nutri_Bot
 
 
 
-                //String endOutput = "";
 
                 switch (userMessage.ToLower())
                 {
@@ -99,7 +99,11 @@ namespace Nutri_Bot
                             await connector.Conversations.ReplyToActivityAsync(passedhere);
                             break;
                         }
-                        if (userMessage.ToLower().Substring(0, 6).Equals("create")) {
+
+
+                        if (userMessage.ToLower().Substring(0, 6).Equals("create"))
+                        {
+                            isadministartion = true;
 
                             String loginsting = userMessage.ToLower();
                             string[] splited = loginsting.Split(new char[0]);
@@ -109,7 +113,7 @@ namespace Nutri_Bot
 
                             string hashpass = password.GetHashCode().ToString();
 
-                           
+
 
 
                             // var md5 = new MD5CryptoServiceProvider();
@@ -119,7 +123,7 @@ namespace Nutri_Bot
                             {
                                 username = username,
                                 password = hashpass
-                              
+
                             };
 
                             List<login> logines = await AzureLoginManager.AzureManagerInstance.Getlogins();
@@ -127,16 +131,16 @@ namespace Nutri_Bot
                             bool userexist = false;
                             foreach (login l in logines)
                             {
-                                
+
                                 if (l.username.Equals(username))
                                 {
                                     Activity loginerr = activity.CreateReply($"error,username is taken try diffrent username");
                                     await connector.Conversations.ReplyToActivityAsync(loginerr);
                                     userexist = true;
-                                    
+
                                 }
 
-                           }
+                            }
 
                             if (userexist == false)
                             {
@@ -148,12 +152,13 @@ namespace Nutri_Bot
                             }
 
 
-                            
+
 
 
                         }
                         if (userMessage.ToLower().Substring(0, 5).Equals("login"))
                         {
+                            isadministartion = true;
                             //clears userdata
                             //await stateClient.BotState.DeleteStateForUserAsync(activity.ChannelId, activity.From.Id);
 
@@ -167,18 +172,17 @@ namespace Nutri_Bot
                             string hashpass = password.GetHashCode().ToString();
 
                             List<login> logines = await AzureLoginManager.AzureManagerInstance.Getlogins();
-
+                            bool userfound = false;
 
                             foreach (login l in logines)
                             {
-                                
+
 
                                 if (l.username.Equals(username))
                                 {
-
+                                    userfound = true;
                                     if (l.password.Equals(hashpass))
                                     {
-
                                         Activity login = activity.CreateReply($"login was sucessfull");
                                         await connector.Conversations.ReplyToActivityAsync(login);
 
@@ -188,94 +192,184 @@ namespace Nutri_Bot
                                         userData.SetProperty<string>("user", username);
                                         await stateClient.BotState.SetUserDataAsync(activity.ChannelId, activity.From.Id, userData);
 
-                                        break;
+
+                                    }
+                                    else
+                                    {
+
+                                        Activity login = activity.CreateReply($"wronge password");
+                                        await connector.Conversations.ReplyToActivityAsync(login);
+
                                     }
 
 
                                 }
-                                
 
-                            
+
+                            }
+
+
+                            if (!userfound)
+                            {
+                                Activity login = activity.CreateReply($"username was not found");
+                                await connector.Conversations.ReplyToActivityAsync(login);
+                            }
+
+
                         }
 
+                        
+                       
+
+
+                        if (userMessage.ToLower().Substring(0, 8).Equals("set name"))
+                        {
+                            
+
+                        }
+                        else
+                        {
+                            bool logged = userData.GetProperty<bool>("logged");
+                            if (!logged == true)
+                            {
+                                if (isadministartion == false)
+                                {
+
+                                    //endOutput = "Home City not assigned";
+                                    Activity names = activity.CreateReply($"  you are not logged in ,you have to login to your to use this app, login by typing login");
+                                    await connector.Conversations.ReplyToActivityAsync(names);
+                                }
+
+                            }
+                            else
+                            {
+                                if (isadministartion == false)
+                                {
+                                    
+
+
+
+                                    if (userMessage.ToLower().Substring(0, 6).Equals("delete"))
+                                    {
+                                        
+                                        String importance = userMessage.ToLower();
+                                        string[] splited = importance.Split(new char[0]);
+
+                                        string id = splited[1];
+
+
+                                        Activity nameassined = activity.CreateReply($" food id" + id + " was deleted from favorites");
+                                        await connector.Conversations.ReplyToActivityAsync(nameassined);
+
+                                        List<Timeline> timelines = await AzureManager.AzureManagerInstance.GetTimelines();
+                                        bool iteamfound = false;
+
+                                        foreach (Timeline t in timelines)
+                                        {
+
+
+                                            if (t.id.Equals("1"))
+                                            {
+                                                iteamfound = true;
+                                                await AzureManager.AzureManagerInstance.DeleteTimeline(t);
+
+                                               
+
+                                           }
+
+                                        }
+
+                                        if (iteamfound == true)
+                                        {
+                                            Activity name = activity.CreateReply($" food id" + id + " was deleted from favorites");
+                                            await connector.Conversations.ReplyToActivityAsync(name);
+                                        }
+                                        else
+                                        {
+                                            Activity name = activity.CreateReply($" food id" + id + " was not found");
+                                            await connector.Conversations.ReplyToActivityAsync(name);
+                                        }
+
+                                    }
+                                   
+
+
+                                    if (userMessage.ToLower().Substring(0, 14).Equals("set importance"))
+                                    {
+                                        String importance = userMessage.ToLower();
+                                        string[] splited = importance.Split(new char[0]);
+                                        List<Timeline> timelines = await AzureManager.AzureManagerInstance.GetTimelines();
+                                        string id = splited[2];
+                                        string value = splited[3];
+
+                                        foreach (Timeline t in timelines)
+                                        {
+
+                                            if (t.id.Equals(id.ToLower()))
+                                            {
+
+                                                t.importance = value;
+                                                await AzureManager.AzureManagerInstance.UpdateTimeline(t);
+                                                Activity update = activity.CreateReply($" importance of "+t.food+" was updated");
+                                                await connector.Conversations.ReplyToActivityAsync(update);
+                                            }
+
+                                        }
+
+                                       
+
+                                    }
+
+
+
+
+                                    await Conversation.SendAsync(activity, () => new Luis(userData.GetProperty<string>("user")));
+                                }
+                            }
+
+                        }
+                        break;
 
 
                 }
-
-
-
-                if (userMessage.ToLower().Substring(0, 8).Equals("set name"))
-                {
-                    string name = userMessage.Substring(9);
-                    userData.SetProperty<string>("Name", name);
-                    await stateClient.BotState.SetUserDataAsync(activity.ChannelId, activity.From.Id, userData);
-
-                    Activity nameassined = activity.CreateReply($"name is assigned " + userData.GetProperty<string>("Name") + " , you can continue now :)");
-                    await connector.Conversations.ReplyToActivityAsync(nameassined);
-
-                }
-                else
-                {
-                    bool logged = userData.GetProperty<bool>("logged");
-                    if (!logged == true)
-                    {
-                        //endOutput = "Home City not assigned";
-                        Activity names = activity.CreateReply($"  you are not logged in ,you have to login to your to use this app, login by typing login");
-                        await connector.Conversations.ReplyToActivityAsync(names);
-
-                    }
-                    else
-                    {
-
-                        await Conversation.SendAsync(activity, () => new Luis(userData.GetProperty<string>("user")));
-                    }
-
-                }
-                break;
 
 
             }
-
-
-
-
-
-        }
             else
             {
                 HandleSystemMessage(activity);
-    }
-    var response = Request.CreateResponse(HttpStatusCode.OK);
+            }
+            var response = Request.CreateResponse(HttpStatusCode.OK);
             return response;
         }
 
-private Activity HandleSystemMessage(Activity message)
-{
-    if (message.Type == ActivityTypes.DeleteUserData)
-    {
-        // Implement user deletion here
-        // If we handle user deletion, return a real message
-    }
-    else if (message.Type == ActivityTypes.ConversationUpdate)
-    {
-        // Handle conversation state changes, like members being added and removed
-        // Use Activity.MembersAdded and Activity.MembersRemoved and Activity.Action for info
-        // Not available in all channels
-    }
-    else if (message.Type == ActivityTypes.ContactRelationUpdate)
-    {
-        // Handle add/remove from contact lists
-        // Activity.From + Activity.Action represent what happened
-    }
-    else if (message.Type == ActivityTypes.Typing)
-    {
-        // Handle knowing tha the user is typing
-    }
-    else if (message.Type == ActivityTypes.Ping)
-    {
-    }
+        private Activity HandleSystemMessage(Activity message)
+        {
+            if (message.Type == ActivityTypes.DeleteUserData)
+            {
+                // Implement user deletion here
+                // If we handle user deletion, return a real message
+            }
+            else if (message.Type == ActivityTypes.ConversationUpdate)
+            {
+                // Handle conversation state changes, like members being added and removed
+                // Use Activity.MembersAdded and Activity.MembersRemoved and Activity.Action for info
+                // Not available in all channels
+            }
+            else if (message.Type == ActivityTypes.ContactRelationUpdate)
+            {
+                // Handle add/remove from contact lists
+                // Activity.From + Activity.Action represent what happened
+            }
+            else if (message.Type == ActivityTypes.Typing)
+            {
+                // Handle knowing tha the user is typing
+            }
+            else if (message.Type == ActivityTypes.Ping)
+            {
+            }
 
-    return null;
-}
+            return null;
+        }
     }
 }
