@@ -59,16 +59,17 @@ namespace Nutri_Bot
                         await connector.Conversations.ReplyToActivityAsync(reply);
                         break;
                     case "help":
-                        var markdownContenth = "#HELP \n";
-                        markdownContenth += "**Create Account Command = create <yourusername> <yourusername> **\n\n";
-                        markdownContenth += "**Login Command = Login <yourusername> <yourusername> **\n\n";
-                        markdownContenth += "**Login to test account Command = Login Test Test **\n\n";
-                        markdownContenth += "**Search Nutrition Command = Nutritions of <fooditem> **\n\n";
-                        markdownContenth += "**add item to favorites Command = add <fooditem> to favorites**\n\n";
-                        markdownContenth += "**view favorites Command = View favorites**\n\n";
-                        markdownContenth += "**set food favorite importance command = set importance <id> <lable>**\n\n";
-                        markdownContenth += "**delete item from favorities command = delete <id> **\n\n";
-                        markdownContenth += "**clear userdata and logout command = clear **\n\n";
+                        var markdownContenth = "#Command HELP \n";
+                        markdownContenth += "                                         \n\n";
+                        markdownContenth += "Create Account  = create <yourusername> <yourusername> \n\n";
+                        markdownContenth += "Login  = Login <yourusername> <yourusername> \n\n";
+                        markdownContenth += "Login to test  = Login Test Test \n\n";
+                        markdownContenth += "Search Nutrition = Nutritions of <fooditem> \n\n";
+                        markdownContenth += "add item to favorites = add <fooditem> to favorites\n\n";
+                        markdownContenth += "view favorites  = View favorites\n\n";
+                        markdownContenth += "set food favorite importance  = set importance <id> <lable>\n\n";
+                        markdownContenth += "delete item from favorities = delete <id> \n\n";
+                        markdownContenth += "clear userdata and logout  = clear\n\n";
 
                         markdownContenth += "![](https://cloud.githubusercontent.com/assets/7879247/20590871/82ece74c-b28a-11e6-9fe6-18a0ab7c5c63.jpg)\n";
                         Activity areplyh = activity.CreateReply(markdownContenth);
